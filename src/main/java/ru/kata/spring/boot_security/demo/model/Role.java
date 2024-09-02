@@ -17,8 +17,8 @@ public class Role implements GrantedAuthority {
 
     @Column(name = "role", nullable = false, unique = true)
     private String role;
-    @Transient
-    @ManyToMany(mappedBy = "role")
+
+    @ManyToMany(mappedBy = "roles")
     private Set<User> usersByRole = new HashSet<>();
 
     public Role() {

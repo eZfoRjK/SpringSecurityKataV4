@@ -19,6 +19,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role findRole(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id не может быть null");
+        }
         return roleDao.findRole(id);
     }
 

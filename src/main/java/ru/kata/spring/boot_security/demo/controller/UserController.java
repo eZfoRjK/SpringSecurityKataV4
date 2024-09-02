@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class UserController {
@@ -26,11 +26,6 @@ public class UserController {
     public UserController(UserService userService,RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-    }
-
-    @PostConstruct
-    public void init(){
-        userService.addAdmin();
     }
 
     @GetMapping("/")
@@ -65,9 +60,20 @@ public class UserController {
     @PostMapping("/admin/new")
     public String addUser(@ModelAttribute("user") User user) {
         Set<Role> roles = new HashSet<>();
-        for (Role role : user.getRoles()) {
-            Long id = Long.parseLong(role.getRole());
-            roles.add(roleService.findRole(id));
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                try {
+                    Long id = Long.parseLong(role.getRole());
+                    Role roleFromDB = roleService.findRole(id);
+                    if (roleFromDB != null) {
+                        roles.add(roleFromDB);
+                    } else {
+                        System.out.println("Роль с id " + id + " не найдена");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Ошибка преобразования роли: " + role.getRole());
+                }
+            }
         }
         user.setRoles(roles);
         userService.add(user);
@@ -84,12 +90,20 @@ public class UserController {
     }
 
     @PatchMapping("/admin/change")
-    public String update(@RequestParam (required = false) List<Long> roleSelectedID,
-                         @ModelAttribute("user") User changedUser)
-    {
-        for(Long roleIdFromFront: roleSelectedID){
-            changedUser.setRoles(roleService.findRole(roleIdFromFront));
+    public String update(@RequestParam(required = false) List<Long> roleSelectedID,
+                         @ModelAttribute("user") User changedUser) {
+        Set<Role> roles = new HashSet<>();
+        if (roleSelectedID != null) {
+            for (Long roleIdFromFront : roleSelectedID) {
+                Role role = roleService.findRole(roleIdFromFront);
+                if (role != null) {
+                    roles.add(role);
+                } else {
+                    System.out.println("Роль с id " + roleIdFromFront + " не найдена");
+                }
+            }
         }
+        changedUser.setRoles(roles);
         userService.update(changedUser);
         return "redirect:/admin";
     }

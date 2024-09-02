@@ -8,4 +8,5 @@ public interface RoleDao {
     Role findRole(Long id);
     Set<Role> rolesSet();
     void add(Role role);
+    Role findByName(String roleName);
 }

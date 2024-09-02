@@ -16,7 +16,8 @@ public class UserDaoImpl implements UserDao {
     private EntityManager entityManager;
 
     @Override
-    public void add(User user) {entityManager.persist(user);
+    public void add(User user) {
+        entityManager.persist(user);
     }
 
     @Override
@@ -35,8 +36,12 @@ public class UserDaoImpl implements UserDao {
     }
     @Override
     public User findUser(Long id) {
-        return entityManager.find(User.class, id );
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return entityManager.find(User.class, id);
     }
+
     @Override
     public void update(User user) {
         entityManager.merge(user);

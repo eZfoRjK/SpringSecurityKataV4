@@ -14,18 +14,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import ru.kata.spring.boot_security.demo.service.UserDetailsServiceImpl;
 
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
 
     public WebSecurityConfig(SuccessUserHandler successUserHandler,
-                             UserDetailsService userDetailsService,
+                             UserDetailsServiceImpl userDetailsService,
                              PasswordEncoder passwordEncoder) {
         this.successUserHandler = successUserHandler;
         this.userDetailsService = userDetailsService;
@@ -37,16 +38,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/start","/addAdmin","/login")
-                .permitAll()
+                .antMatchers("/start", "/addAdmin", "/login").permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/admin","/admin/addForm","/admin/changeForm","/user").hasAuthority("admin")
-                .antMatchers("/user").hasAnyAuthority("user","admin")
+                .antMatchers("/admin", "/admin/addForm", "/admin/changeForm").hasRole("admin")
+                .antMatchers("/user").hasAnyRole("user", "admin")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successHandler(successUserHandler)
-                .permitAll()
+                .formLogin().successHandler(successUserHandler).permitAll()
                 .and()
                 .logout()
                 .permitAll()
@@ -68,8 +67,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public static PasswordEncoder noPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
+//    @Bean
+//    public static PasswordEncoder noPasswordEncoder() {
+//        return NoOpPasswordEncoder.getInstance();
+//    }
 }
