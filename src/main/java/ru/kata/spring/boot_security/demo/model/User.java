@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @Column(name = "login", nullable = false, unique = true)
     private String login;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     @JoinTable (name = "users_role",
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id")
@@ -159,4 +159,3 @@ public class User implements UserDetails {
         return Objects.hash(id, password, login);
     }
 }
-

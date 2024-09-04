@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.RoleDao;
 import ru.kata.spring.boot_security.demo.dao.UserDao;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.Set;
@@ -31,7 +30,6 @@ public class UserServiceImpl implements UserService{
         userDao.add(user);
     }
 
-    @Transactional
     @Override
     public Set<User> listUsers() {
         return userDao.listUsers();
@@ -55,35 +53,5 @@ public class UserServiceImpl implements UserService{
             changedUser.setPassword(passwordEncoder.encode(changedUser.getPassword()));
         }
         userDao.update(changedUser);
-    }
-
-    @Transactional
-    @Override
-    public void addAdmin() {
-        if (userDao.ifDBEmpty()) {
-            User admin = new User("admin", "admin", 44);
-            admin.setPassword(passwordEncoder.encode("admin"));
-            admin.setLogin("admin");;
-
-            Role adminRole = roleDao.findByName("admin");
-            if (adminRole == null) {
-                adminRole = new Role("admin");
-                roleDao.add(adminRole);
-            }
-            admin.getRoles().add(adminRole);
-            userDao.add(admin);
-
-            User user = new User("user", "user", 32);
-            user.setPassword(passwordEncoder.encode("user"));
-            user.setLogin("user");
-
-            Role userRole = roleDao.findByName("user");
-            if (userRole == null) {
-                userRole = new Role("user");
-                roleDao.add(userRole);
-            }
-            user.getRoles().add(userRole);
-            userDao.add(user);
-        }
     }
 }

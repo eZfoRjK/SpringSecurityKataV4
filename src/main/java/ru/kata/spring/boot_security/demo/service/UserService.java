@@ -10,5 +10,4 @@ public interface UserService {
     void removeUserById(Long id);
     User findUser(Long id);
     void update(User changedUser);
-    void addAdmin();
 }
